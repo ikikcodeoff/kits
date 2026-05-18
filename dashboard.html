@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KITS — Dashboard Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#060606;--white:#f0f0ef;--neon:#00ff87;--neon2:#00d4ff;
+  --neon-dim:rgba(0,255,135,.09);--glow:0 0 24px rgba(0,255,135,.4);
+  --gray:#0f0f0f;--gray2:#181818;--gray3:#242424;--gray4:#333;
+  --text:#b0b0b0;--border:rgba(255,255,255,.07);
+  --fd:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'Space Mono',monospace;
+  --danger:#ff4757;--warn:#ffa502;--success:#00ff87;
+  --sidebar:240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--white);font-family:var(--fb);font-weight:300;display:flex;min-height:100vh;overflow-x:hidden}
+button{border:none;cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit;outline:none}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--gray2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
+.sb-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
+.sb-logo-main{font-family:var(--fd);font-size:28px;letter-spacing:4px}
+.sb-logo-main span{color:var(--neon)}
+.sb-logo-sub{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.sb-nav{padding:16px 0;flex:1;overflow-y:auto}
+.sb-section{font-family:var(--fm);font-size:8px;color:rgba(255,255,255,.25);letter-spacing:3px;text-transform:uppercase;padding:12px 20px 6px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;position:relative}
+.sb-item:hover{color:var(--white);background:rgba(255,255,255,.03)}
+.sb-item.active{color:var(--neon);background:var(--neon-dim)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--neon)}
+.sb-item-icon{font-size:16px;width:20px;text-align:center}
+.sb-bottom{padding:16px 20px;border-top:1px solid var(--border)}
+.sb-store-link{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:1px;text-transform:uppercase;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:3px;transition:all .2s}
+.sb-store-link:hover{border-color:var(--neon);color:var(--neon)}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--gray2);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:var(--fd);font-size:22px;color:var(--white);letter-spacing:1px}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.tb-badge{font-family:var(--fm);font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;border-radius:2px;background:var(--neon-dim);color:var(--neon);border:1px solid rgba(0,255,135,.2)}
+.content{padding:28px 32px;flex:1}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--gray2);border:1px solid var(--border);padding:20px;border-radius:3px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--neon);opacity:.3}
+.stat-num{font-family:var(--fd);font-size:40px;color:var(--neon);line-height:1;letter-spacing:.5px}
+.stat-label{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.stat-icon{position:absolute;top:16px;right:16px;font-size:24px;opacity:.3}
+
+/* SECTION CARD */
+.section-card{background:var(--gray2);border:1px solid var(--border);border-radius:3px;margin-bottom:20px}
+.sc-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sc-title{font-family:var(--fm);font-size:10px;color:var(--white);letter-spacing:2px;text-transform:uppercase}
+.sc-actions{display:flex;gap:8px}
+.sc-body{padding:20px}
+
+/* BUTTONS */
+.btn{font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:9px 16px;border-radius:2px;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px}
+.btn-neon{background:var(--neon);color:var(--black);font-weight:700}
+.btn-neon:hover{background:var(--white)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.15)}
+.btn-outline:hover{border-color:var(--neon);color:var(--neon)}
+.btn-danger{background:rgba(255,71,87,.1);color:var(--danger);border:1px solid rgba(255,71,87,.3)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-warn{background:rgba(255,165,2,.1);color:var(--warn);border:1px solid rgba(255,165,2,.3)}
+.btn-warn:hover{background:var(--warn);color:var(--black)}
+.btn-sm{padding:6px 12px;font-size:8px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;font-size:14px}
+
+/* PRODUCTS TABLE */
+.prod-table{width:100%;border-collapse:collapse}
+.prod-table th{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:2px;text-transform:uppercase;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.prod-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.prod-table tr:hover td{background:rgba(255,255,255,.02)}
+.prod-table tr:last-child td{border-bottom:none}
+.prod-thumb{width:44px;height:58px;object-fit:cover;border-radius:2px;background:var(--gray3)}
+.prod-club{font-family:var(--fm);font-size:8px;color:var(--neon);letter-spacing:1px;text-transform:uppercase}
+.prod-name{font-family:var(--fd);font-size:16px;color:var(--white);letter-spacing:.3px}
+.prod-type-pill{font-family:var(--fm);font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;display:inline-block}
+.type-home{background:rgba(0,255,135,.1);color:var(--neon);border:1px solid rgba(0,255,135,.2)}
+.type-away{background:rgba(0,212,255,.1);color:var(--neon2);border:1px solid rgba(0,212,255,.2)}
+.type-special{background:rgba(255,165,2,.1);color:var(--warn);border:1px solid rgba(255,165,2,.2)}
+.badge-pill{font-family:var(--fm);font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;display:inline-block}
+.badge-hot{background:rgba(255,71,87,.15);color:var(--danger)}
+.badge-new{background:var(--neon-dim);color:var(--neon)}
+.badge-pop{background:rgba(255,255,255,.05);color:var(--text)}
+.badge-none{color:rgba(255,255,255,.2);font-size:10px}
+.prod-price{font-family:var(--fd);font-size:18px;color:var(--neon)}
+.td-actions{display:flex;gap:6px}
+
+/* FORM MODAL */
+.form-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(12px)}
+.form-overlay.open{display:flex}
+.form-panel{background:var(--gray2);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;border:1px solid var(--border);border-radius:3px}
+.form-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--gray2);z-index:10}
+.form-title{font-family:var(--fd);font-size:24px;color:var(--white);letter-spacing:.5px}
+.form-body{padding:24px;display:grid;gap:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:grid;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:2px;text-transform:uppercase}
+.form-input{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:10px 14px;font-size:13px;border-radius:2px;transition:border-color .2s;width:100%}
+.form-input:focus{border-color:var(--neon)}
+.form-select{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:10px 14px;font-size:13px;border-radius:2px;width:100%;appearance:none;cursor:pointer}
+.form-select:focus{border-color:var(--neon)}
+select option{background:var(--gray3)}
+.img-preview{width:100%;height:120px;object-fit:cover;border-radius:2px;background:var(--gray3);border:1px solid var(--border);margin-top:6px}
+.form-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--gray2)}
+
+/* JSON EDITOR */
+.json-area{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:#00ff87;font-family:var(--fm);font-size:11px;line-height:1.6;padding:16px;border-radius:2px;width:100%;min-height:300px;resize:vertical;transition:border-color .2s}
+.json-area:focus{border-color:var(--neon)}
+
+/* PAYPAL GUIDE */
+.paypal-guide{background:rgba(255,196,57,.04);border:1px solid rgba(255,196,57,.2);border-radius:3px;padding:20px;margin-bottom:20px}
+.pg-title{font-family:var(--fm);font-size:10px;color:#ffc439;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pg-step{display:flex;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,196,57,.1)}
+.pg-step:last-child{border-bottom:none;margin-bottom:0}
+.pg-step-num{width:24px;height:24px;background:#ffc439;color:#003087;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:700;flex-shrink:0}
+.pg-step-content{flex:1}
+.pg-step-title{font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.pg-step-desc{font-size:12px;color:var(--text);line-height:1.6}
+.pg-step-code{font-family:var(--fm);font-size:10px;background:rgba(0,0,0,.4);color:#ffc439;padding:6px 10px;border-radius:2px;margin-top:6px;display:inline-block;word-break:break-all}
+
+/* REVENUE OVERVIEW */
+.rev-bar-wrap{margin-top:16px}
+.rev-bar-item{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.rev-bar-label{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:1px;text-transform:uppercase;width:80px;flex-shrink:0}
+.rev-bar-bg{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.rev-bar-fill{height:100%;background:var(--neon);border-radius:3px;transition:width .8s ease}
+.rev-bar-val{font-family:var(--fd);font-size:14px;color:var(--white);width:60px;text-align:right;flex-shrink:0}
+
+/* NOTIFY */
+.notify{position:fixed;bottom:20px;right:24px;background:var(--gray);border:1px solid var(--neon);padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:500;opacity:0;transition:all .4s;border-radius:2px;box-shadow:var(--glow);transform:translateY(20px)}
+.notify.show{opacity:1;transform:translateY(0)}
+.notify-text{font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px}
+
+/* TABS */
+.view-tabs{display:none}
+.view-tabs.active{display:block}
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab-btn{font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:2px;text-transform:uppercase;padding:12px 20px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s}
+.tab-btn:hover{color:var(--white)}
+.tab-btn.on{color:var(--neon);border-bottom-color:var(--neon)}
+
+/* SEARCH BAR */
+.table-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:8px 14px;font-family:var(--fm);font-size:9px;letter-spacing:1px;border-radius:2px;width:220px;transition:border-color .2s}
+.search-box:focus{border-color:var(--neon)}
+.search-box::placeholder{color:var(--text)}
+.filter-sel{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 12px;font-family:var(--fm);font-size:9px;border-radius:2px;cursor:pointer}
+.filter-sel:focus{border-color:var(--neon)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .mob-toggle{display:flex!important}
+}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr}}
+.mob-toggle{display:none;background:none;border:none;font-size:20px;color:var(--white);cursor:pointer}
+
+/* ORDERS TABLE */
+.orders-table{width:100%;border-collapse:collapse}
+.orders-table th{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:2px;text-transform:uppercase;text-align:left;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.orders-table td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:12px}
+.orders-table tr:hover td{background:rgba(255,255,255,.02)}
+.orders-table tr:last-child td{border-bottom:none}
+.order-id{font-family:var(--fm);font-size:9px;color:var(--neon);letter-spacing:1px}
+.order-customer{font-weight:500;color:var(--white)}
+.order-customer-email{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:.5px}
+.order-total{font-family:var(--fd);font-size:16px;color:var(--neon)}
+.status-badge{font-family:var(--fm);font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;border-radius:2px;display:inline-block;white-space:nowrap}
+.status-paid{background:rgba(0,255,135,.1);color:var(--neon);border:1px solid rgba(0,255,135,.2)}
+.status-processing{background:rgba(255,165,2,.1);color:var(--warn);border:1px solid rgba(255,165,2,.2)}
+.status-shipped{background:rgba(0,212,255,.1);color:var(--neon2);border:1px solid rgba(0,212,255,.2)}
+.status-delivered{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.1)}
+.order-items-text{font-size:11px;color:var(--text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.order-detail-row{display:none;background:rgba(255,255,255,.015)}
+.order-detail-row.open{display:table-row}
+.order-detail-content{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.od-section-title{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.od-item{padding:8px;background:var(--gray3);border-radius:2px;margin-bottom:6px;font-size:11px;color:var(--white)}
+.od-item-club{font-family:var(--fm);font-size:7px;color:var(--neon);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.od-item-opts{font-size:10px;color:var(--text);margin-top:3px}
+.od-info-line{display:flex;gap:8px;margin-bottom:5px;font-size:11px;color:var(--white)}
+.od-info-lbl{font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:1px;min-width:80px}
+.status-select{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:6px 10px;font-family:var(--fm);font-size:8px;border-radius:2px;cursor:pointer;letter-spacing:1px}
+.tracking-num-input{background:var(--gray3);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:6px 10px;font-family:var(--fm);font-size:9px;border-radius:2px;width:180px;margin-right:6px}
+.tracking-num-input:focus{border-color:var(--neon);outline:none}
+.orders-empty{padding:48px;text-align:center;font-family:var(--fm);font-size:10px;color:var(--text);letter-spacing:2px;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-main">KIT<span>S</span></div>
+    <div class="sb-logo-sub">Dashboard Admin</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" onclick="showView('dashboard',this)"><span class="sb-item-icon">📊</span>Vue d'ensemble</div>
+    <div class="sb-item" onclick="showView('products',this)"><span class="sb-item-icon">👕</span>Produits</div>
+    <div class="sb-item" onclick="showView('orders',this)"><span class="sb-item-icon">📦</span>Commandes <span id="sb-orders-badge" style="margin-left:auto;background:var(--danger);color:#fff;font-size:8px;padding:2px 6px;border-radius:10px;font-family:var(--fm);display:none">0</span></div>
+    <div class="sb-section">Données</div>
+    <div class="sb-item" onclick="showView('database',this)"><span class="sb-item-icon">🗄️</span>Base de données</div>
+    <div class="sb-item" onclick="showView('export',this)"><span class="sb-item-icon">📤</span>Export / Import</div>
+    <div class="sb-section">Paiement</div>
+    <div class="sb-item" onclick="showView('paypal',this)"><span class="sb-item-icon">💳</span>Config PayPal</div>
+    <div class="sb-item" onclick="showView('settings',this)"><span class="sb-item-icon">⚙️</span>Paramètres</div>
+  </nav>
+  <div class="sb-bottom">
+    <a class="sb-store-link" href="kits-store.html" target="_blank">
+      <span>🛍️</span> Voir la boutique →
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="mob-toggle" onclick="toggleSidebar()">☰</button>
+      <span class="topbar-title" id="topbarTitle">VUE D'ENSEMBLE</span>
+    </div>
+    <div class="topbar-actions">
+      <span class="tb-badge" id="productCountBadge">0 produits</span>
+      <button class="btn btn-neon btn-sm" onclick="showView('products',null);openProductForm()">+ Nouveau produit</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <div class="view-tabs active" id="view-dashboard">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="stat-icon">👕</div>
+          <div class="stat-num" id="ds-total">0</div>
+          <div class="stat-label">Produits actifs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-num" id="ds-orders">0</div>
+          <div class="stat-label">Commandes totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚙️</div>
+          <div class="stat-num" id="ds-pending">0</div>
+          <div class="stat-label">En attente</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-num" id="ds-revenue" style="font-size:28px">0 €</div>
+          <div class="stat-label">Chiffre d'affaires</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="section-card">
+          <div class="sc-header">
+            <span class="sc-title">Répartition par club</span>
+          </div>
+          <div class="sc-body">
+            <div class="rev-bar-wrap" id="catBars"></div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-header"><span class="sc-title">Infos boutique</span></div>
+          <div class="sc-body">
+            <div style="display:grid;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray3);border-radius:2px">
+                <span style="font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:1px;text-transform:uppercase">Prix de base</span>
+                <span style="font-family:var(--fd);font-size:20px;color:var(--neon)">24,99 €</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray3);border-radius:2px">
+                <span style="font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:1px;text-transform:uppercase">Patch max</span>
+                <span style="font-family:var(--fd);font-size:20px;color:var(--neon)">+2,99 €</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray3);border-radius:2px">
+                <span style="font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:1px;text-transform:uppercase">Flocage haut</span>
+                <span style="font-family:var(--fd);font-size:20px;color:var(--neon)">+4,99 €</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray3);border-radius:2px">
+                <span style="font-family:var(--fm);font-size:9px;color:var(--text);letter-spacing:1px;text-transform:uppercase">Flocage bas</span>
+                <span style="font-family:var(--fd);font-size:20px;color:var(--neon)">+1,99 €</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header">
+          <span class="sc-title">🚀 Checklist mise en ligne</span>
+        </div>
+        <div class="sc-body">
+          <div style="display:grid;gap:10px">
+            <div class="checklist-item" id="ck-products" style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray3);border-radius:2px">
+              <span id="ck-products-icon">⏳</span>
+              <div><div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase">Produits ajoutés</div><div style="font-size:11px;color:var(--text);margin-top:2px">Ajouter au moins 1 produit actif</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray3);border-radius:2px">
+              <span>💳</span>
+              <div><div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase">Configurer PayPal</div><div style="font-size:11px;color:var(--text);margin-top:2px">Remplacer "sb" par votre vrai Client ID PayPal dans le HTML</div></div>
+              <button class="btn btn-warn btn-sm" style="margin-left:auto" onclick="showView('paypal',null)">Configurer →</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray3);border-radius:2px">
+              <span>📸</span>
+              <div><div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase">Ajouter vos photos</div><div style="font-size:11px;color:var(--text);margin-top:2px">Uploader vos photos sur Imgur/Cloudinary et coller les URLs</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray3);border-radius:2px">
+              <span>🌐</span>
+              <div><div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase">Héberger le site</div><div style="font-size:11px;color:var(--text);margin-top:2px">Netlify, Vercel, ou GitHub Pages (gratuit)</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PRODUCTS ══════════ -->
+    <div class="view-tabs" id="view-products">
+      <div class="table-toolbar">
+        <input type="text" class="search-box" placeholder="Rechercher..." id="prodSearch" oninput="renderProdTable()">
+        <select class="filter-sel" id="prodCatFilter" onchange="renderProdTable()">
+          <option value="">Tous les clubs</option>
+        </select>
+        <select class="filter-sel" id="prodTypeFilter" onchange="renderProdTable()">
+          <option value="">Tous les types</option>
+          <option value="home">Domicile</option>
+          <option value="away">Extérieur</option>
+          <option value="special">Édition spéciale</option>
+        </select>
+        <button class="btn btn-neon btn-sm" onclick="openProductForm()">+ Ajouter produit</button>
+        <span style="font-family:var(--fm);font-size:8px;color:var(--text);letter-spacing:1px;margin-left:auto" id="prodTableCount"></span>
+      </div>
+      <div class="section-card">
+        <div class="sc-body" style="padding:0;overflow-x:auto">
+          <table class="prod-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Club / Nom</th>
+                <th>Type</th>
+                <th>Badge</th>
+                <th>Saison</th>
+                <th>Prix</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="prodTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ DATABASE ══════════ -->
+    <div class="view-tabs" id="view-database">
+      <div class="section-card">
+        <div class="sc-header">
+          <span class="sc-title">Éditeur JSON en direct</span>
+          <div class="sc-actions">
+            <button class="btn btn-outline btn-sm" onclick="refreshJsonEditor()">↻ Rafraîchir</button>
+            <button class="btn btn-neon btn-sm" onclick="applyJsonEditor()">✓ Appliquer</button>
+          </div>
+        </div>
+        <div class="sc-body">
+          <p style="font-size:12px;color:var(--text);margin-bottom:12px;line-height:1.7">
+            Modifiez directement la base de données JSON. Chaque produit doit avoir les champs : <code style="color:var(--neon);font-family:var(--fm);font-size:10px">id, club, name, type, badge, cat, season, price, img, img2</code>
+          </p>
+          <textarea class="json-area" id="jsonEditor" spellcheck="false"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ EXPORT/IMPORT ══════════ -->
+    <div class="view-tabs" id="view-export">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+        <div class="section-card">
+          <div class="sc-header"><span class="sc-title">📤 Exporter la DB</span></div>
+          <div class="sc-body">
+            <p style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">
+              Téléchargez votre base de données produits en JSON. Conservez ce fichier comme sauvegarde ou pour le partager.
+            </p>
+            <button class="btn btn-neon" onclick="exportDB()">⬇ Télécharger products.json</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sc-header"><span class="sc-title">📥 Importer une DB</span></div>
+          <div class="sc-body">
+            <p style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">
+              Importez un fichier JSON exporté précédemment. Attention : cela remplacera la DB actuelle.
+            </p>
+            <label style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:9px;color:var(--black);background:var(--neon);padding:9px 16px;border-radius:2px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;font-weight:700">
+              <input type="file" accept=".json" onchange="importDB(event)" style="display:none">
+              ⬆ Choisir un fichier JSON
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">📋 Générer le code HTML à insérer dans kits-store.html</span></div>
+        <div class="sc-body">
+          <p style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">
+            Ce code remplace le tableau <code style="color:var(--neon);font-family:var(--fm);font-size:10px">PRODUCTS = [...]</code> dans votre fichier kits-store.html.
+          </p>
+          <button class="btn btn-outline" onclick="generateCode()" style="margin-bottom:12px">⚙ Générer le code</button>
+          <textarea class="json-area" id="generatedCode" placeholder="Cliquez sur 'Générer le code' pour voir le résultat..." readonly style="min-height:200px;color:var(--text)"></textarea>
+          <button class="btn btn-neon btn-sm" style="margin-top:8px" onclick="copyCode()">📋 Copier le code</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">⚠️ Réinitialiser</span></div>
+        <div class="sc-body">
+          <p style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">Recharge la base de données par défaut. Toutes vos modifications seront perdues.</p>
+          <button class="btn btn-danger" onclick="if(confirm('Réinitialiser la DB ?')){resetDB()}">🗑 Réinitialiser la DB</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PAYPAL ══════════ -->
+    <div class="view-tabs" id="view-paypal">
+      <div class="paypal-guide">
+        <div class="pg-title">💰 Comment recevoir votre argent via PayPal</div>
+        <div class="pg-step">
+          <div class="pg-step-num">1</div>
+          <div class="pg-step-content">
+            <div class="pg-step-title">Créer un compte PayPal Business</div>
+            <div class="pg-step-desc">Allez sur <strong>paypal.com</strong> et créez un compte "Business" (gratuit). Vous recevrez l'argent directement sur ce compte.</div>
+          </div>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-num">2</div>
+          <div class="pg-step-content">
+            <div class="pg-step-title">Obtenir votre Client ID PayPal</div>
+            <div class="pg-step-desc">Connectez-vous sur <strong>developer.paypal.com</strong> → "My Apps & Credentials" → "Create App" → Copier le <strong>Client ID LIVE</strong>.</div>
+            <div class="pg-step-code">developer.paypal.com/developer/applications</div>
+          </div>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-num">3</div>
+          <div class="pg-step-content">
+            <div class="pg-step-title">Remplacer dans kits-store.html</div>
+            <div class="pg-step-desc">Dans votre fichier <strong>kits-store.html</strong>, trouvez cette ligne et remplacez <code>sb</code> par votre vrai Client ID :</div>
+            <div class="pg-step-code">&lt;script src="https://www.paypal.com/sdk/js?client-id=<span style="color:#ff4757">VOTRE_CLIENT_ID</span>&currency=EUR&locale=fr_FR"&gt;</div>
+          </div>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-num">4</div>
+          <div class="pg-step-content">
+            <div class="pg-step-title">Tester en mode sandbox</div>
+            <div class="pg-step-desc">Gardez <code>sb</code> pour les tests, remplacez par votre vrai ID uniquement quand vous mettez le site en ligne.</div>
+          </div>
+        </div>
+        <div class="pg-step">
+          <div class="pg-step-num">5</div>
+          <div class="pg-step-content">
+            <div class="pg-step-title">Retirer l'argent</div>
+            <div class="pg-step-desc">Les paiements arrivent sur votre compte PayPal. Depuis paypal.com → "Retirer" → vers votre compte bancaire. Délai : 1 à 3 jours ouvrés. <strong>Frais PayPal : ~3.4% + 0.35€ par transaction.</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">Votre Client ID PayPal</span></div>
+        <div class="sc-body">
+          <div class="form-group">
+            <label class="form-label">Client ID PayPal (LIVE)</label>
+            <input type="text" class="form-input" id="paypalClientId" placeholder="AXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" value="">
+            <span style="font-size:11px;color:var(--text);margin-top:4px">Trouvez-le sur developer.paypal.com · Apps & Credentials · LIVE</span>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-neon" onclick="savePaypalId()">💾 Générer le code</button>
+          </div>
+          <div id="paypalCodeResult" style="display:none;margin-top:16px">
+            <div class="form-label" style="margin-bottom:6px">Remplacez la balise script dans votre HTML :</div>
+            <textarea class="json-area" id="paypalCodeLine" readonly style="min-height:80px;font-size:10px;color:#ffc439"></textarea>
+            <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="document.getElementById('paypalCodeLine').select();document.execCommand('copy');showNotify('✓ Code copié !')">📋 Copier</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">Alternatives de paiement</span></div>
+        <div class="sc-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="padding:16px;background:var(--gray3);border-radius:2px;border:1px solid var(--border)">
+              <div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">💳 Stripe</div>
+              <div style="font-size:12px;color:var(--text);line-height:1.6">Alternative à PayPal. Frais similaires (~1.5% EU). Nécessite une intégration technique plus avancée.</div>
+            </div>
+            <div style="padding:16px;background:var(--gray3);border-radius:2px;border:1px solid var(--border)">
+              <div style="font-family:var(--fm);font-size:9px;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🏦 Virement IBAN</div>
+              <div style="font-size:12px;color:var(--text);line-height:1.6">Affichez votre IBAN pour paiement manuel. Plus lent mais sans frais. Idéal pour les grosses commandes.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <div class="view-tabs" id="view-settings">
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">Paramètres de la boutique</span></div>
+        <div class="sc-body">
+          <div style="display:grid;gap:16px">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nom de la boutique</label>
+                <input type="text" class="form-input" id="set-shopname" value="KITS">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Prix de base (€)</label>
+                <input type="number" class="form-input" id="set-baseprice" value="24.99" step="0.01">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email contact</label>
+                <input type="email" class="form-input" id="set-email" value="contact@kits-football.fr">
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp</label>
+                <input type="text" class="form-input" id="set-whatsapp" placeholder="+33 6 XX XX XX XX">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Texte promo banner</label>
+              <input type="text" class="form-input" id="set-promo" value="🔥 3 achetés = 1 OFFERT ✦ Livraison offerte dès 49€ ✦ Flocage pro disponible">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Instagram URL</label>
+              <input type="text" class="form-input" id="set-instagram" placeholder="https://instagram.com/votre_compte">
+            </div>
+            <div style="padding-top:8px">
+              <button class="btn btn-neon" onclick="saveSettings()">💾 Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="sc-header"><span class="sc-title">🌐 Hébergement gratuit</span></div>
+        <div class="sc-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="padding:16px;background:var(--gray3);border-radius:2px;border:1px solid var(--border)">
+              <div style="font-family:var(--fm);font-size:9px;color:var(--neon);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Netlify</div>
+              <div style="font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">Glissez-déposez vos fichiers. Gratuit, rapide, SSL automatique.</div>
+              <div style="font-family:var(--fm);font-size:9px;color:rgba(255,255,255,.3)">netlify.com</div>
+            </div>
+            <div style="padding:16px;background:var(--gray3);border-radius:2px;border:1px solid var(--border)">
+              <div style="font-family:var(--fm);font-size:9px;color:var(--neon);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Vercel</div>
+              <div style="font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">Déploiement automatique depuis GitHub. CDN mondial inclus.</div>
+              <div style="font-family:var(--fm);font-size:9px;color:rgba(255,255,255,.3)">vercel.com</div>
+            </div>
+            <div style="padding:16px;background:var(--gray3);border-radius:2px;border:1px solid var(--border)">
+              <div style="font-family:var(--fm);font-size:9px;color:var(--neon);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">GitHub Pages</div>
+              <div style="font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">Hébergement direct depuis un repo GitHub. 100% gratuit.</div>
+              <div style="font-family:var(--fm);font-size:9px;color:rgba(255,255,255,.3)">pages.github.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ORDERS ══════════ -->
+    <div class="view-tabs" id="view-orders">
+      <div class="section-card" style="margin-bottom:16px">
+        <div class="sc-header">
+          <span class="sc-title">📦 Gestion des commandes</span>
+          <div class="sc-actions">
+            <input type="text" class="search-box" id="orderSearch" placeholder="Chercher commande, client..." oninput="renderOrders()">
+            <select class="filter-sel" id="orderStatusFilter" onchange="renderOrders()">
+              <option value="all">Tous statuts</option>
+              <option value="paid">✅ Payée</option>
+              <option value="processing">⚙️ En préparation</option>
+              <option value="shipped">🚚 Expédiée</option>
+              <option value="delivered">🏠 Livrée</option>
+            </select>
+          </div>
+        </div>
+        <div class="sc-body" style="padding:0">
+          <div id="ordersTableWrap"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- PRODUCT FORM MODAL -->
+<div class="form-overlay" id="prodFormOverlay">
+  <div class="form-panel">
+    <div class="form-header">
+      <span class="form-title" id="formTitle">NOUVEAU PRODUIT</span>
+      <button class="btn btn-outline btn-icon" onclick="closeProductForm()">✕</button>
+    </div>
+    <div class="form-body">
+      <input type="hidden" id="fid">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Club (affiché)</label>
+          <input type="text" class="form-input" id="fclub" placeholder="PSG, Real Madrid...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie (filtre)</label>
+          <input type="text" class="form-input" id="fcat" placeholder="PSG, Bayern...">
+        </div>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Nom du maillot</label>
+        <input type="text" class="form-input" id="fname" placeholder="Domicile 2025-26">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="ftype">
+            <option value="home">Domicile</option>
+            <option value="away">Extérieur</option>
+            <option value="special">Édition spéciale</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Badge</label>
+          <select class="form-select" id="fbadge">
+            <option value="">Aucun</option>
+            <option value="new">NEW</option>
+            <option value="hot">HOT</option>
+            <option value="pop">POPULAIRE</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Saison</label>
+          <input type="text" class="form-input" id="fseason" value="25/26" placeholder="25/26">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prix (€)</label>
+          <input type="number" class="form-input" id="fprice" value="24.99" step="0.01" min="0">
+        </div>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">URL Image principale</label>
+        <input type="text" class="form-input" id="fimg" placeholder="https://..." oninput="previewImg()">
+        <img id="imgPreview" class="img-preview" src="" alt="" style="display:none">
+        <span style="font-size:11px;color:var(--text);margin-top:4px">Hébergez sur imgur.com, cloudinary.com ou unsplash.com</span>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">URL Image secondaire (hover)</label>
+        <input type="text" class="form-input" id="fimg2" placeholder="https://...">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">ID unique (généré automatiquement)</label>
+        <input type="text" class="form-input" id="fid-display" placeholder="psg-dom-2526" style="color:var(--text)">
+        <span style="font-size:11px;color:var(--text);margin-top:4px">Laissez vide pour générer automatiquement</span>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-outline" onclick="closeProductForm()">Annuler</button>
+      <button class="btn btn-neon" onclick="saveProduct()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFY -->
+<div class="notify" id="notify">
+  <span class="notify-text" id="notifyText">Sauvegardé !</span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DB — partagée avec le store via localStorage
+// ══════════════════════════════════════════════
+function loadDB() {
+  try {
+    const s = localStorage.getItem('kits_products');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return getDefaultProducts();
+}
+
+function saveDB(prods) {
+  localStorage.setItem('kits_products', JSON.stringify(prods));
+}
+
+function getDefaultProducts() {
+  const IMG = {
+    jersey_red: 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=600&q=80',
+    jersey_wht: 'https://images.unsplash.com/photo-1620287341056-49a2f1ab2fdc?w=600&q=80',
+    jersey_blk: 'https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=600&q=80',
+    jersey_blu: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&q=80',
+    jersey_yel: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&q=80',
+    jersey_grn: 'https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80',
+    match1:     'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80',
+    match2:     'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600&q=80',
+    stadium:    'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&q=80',
+    fan1:       'https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=600&q=80',
+    fan2:       'https://images.unsplash.com/photo-1540778926-7d9ce5e13c70?w=600&q=80',
+    fan3:       'https://images.unsplash.com/photo-1519766304817-4f37bda74a26?w=600&q=80',
+  };
+  return [
+    {id:'psg-dom',club:'PSG',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'PSG',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.match1},
+    {id:'psg-ext',club:'PSG',name:'Extérieur 2025-26',type:'away',badge:null,cat:'PSG',season:'25/26',price:24.99,img:IMG.jersey_blu,img2:IMG.stadium},
+    {id:'psg-third',club:'PSG',name:'Third 2025-26',type:'special',badge:'new',cat:'PSG',season:'25/26',price:24.99,img:IMG.jersey_blk,img2:IMG.match2},
+    {id:'rm-dom',club:'Real Madrid',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Real Madrid',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.fan1},
+    {id:'rm-ext',club:'Real Madrid',name:'Extérieur 2025-26',type:'away',badge:'new',cat:'Real Madrid',season:'25/26',price:24.99,img:IMG.jersey_blu,img2:IMG.match1},
+    {id:'ars-dom',club:'Arsenal',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Arsenal',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.fan2},
+    {id:'ars-ext',club:'Arsenal',name:'Extérieur 2025-26',type:'away',badge:null,cat:'Arsenal',season:'25/26',price:24.99,img:IMG.jersey_yel,img2:IMG.fan3},
+    {id:'ars-third',club:'Arsenal',name:'Third 2025-26',type:'special',badge:'new',cat:'Arsenal',season:'25/26',price:24.99,img:IMG.jersey_blk,img2:IMG.stadium},
+    {id:'bay-dom',club:'Bayern Munich',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Bayern',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.fan1},
+    {id:'bay-ext',club:'Bayern Munich',name:'Extérieur 2025-26',type:'away',badge:'new',cat:'Bayern',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.match2},
+    {id:'lfc-dom',club:'Liverpool FC',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Liverpool',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.stadium},
+    {id:'lfc-ext',club:'Liverpool FC',name:'Extérieur 2025-26',type:'away',badge:null,cat:'Liverpool',season:'25/26',price:24.99,img:IMG.jersey_grn,img2:IMG.fan2},
+    {id:'lfc-third',club:'Liverpool FC',name:'Third 2025-26',type:'special',badge:'new',cat:'Liverpool',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.fan3},
+    {id:'barca-dom',club:'FC Barcelone',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Barcelone',season:'25/26',price:24.99,img:IMG.jersey_blu,img2:IMG.match1},
+    {id:'barca-ext',club:'FC Barcelone',name:'Extérieur 2025-26',type:'away',badge:null,cat:'Barcelone',season:'25/26',price:24.99,img:IMG.jersey_yel,img2:IMG.fan1},
+    {id:'mar-dom',club:'Maroc 🇲🇦',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Maroc',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.fan3},
+    {id:'mar-ext',club:'Maroc 🇲🇦',name:'Extérieur 2025-26',type:'away',badge:null,cat:'Maroc',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.match2},
+    {id:'fra-dom',club:'France 🇫🇷',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'France',season:'25/26',price:24.99,img:IMG.jersey_blu,img2:IMG.stadium},
+    {id:'fra-ext',club:'France 🇫🇷',name:'Extérieur 2025-26',type:'away',badge:'new',cat:'France',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.fan2},
+    {id:'alg-dom',club:'Algérie 🇩🇿',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Algérie',season:'25/26',price:24.99,img:IMG.jersey_wht,img2:IMG.fan3},
+    {id:'arg-dom',club:'Argentine 🏆',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Argentine',season:'25/26',price:24.99,img:IMG.jersey_blu,img2:IMG.match1},
+    {id:'arg-ext',club:'Argentine 🏆',name:'Extérieur 2025-26',type:'away',badge:null,cat:'Argentine',season:'25/26',price:24.99,img:IMG.jersey_blk,img2:IMG.fan1},
+    {id:'por-dom',club:'Portugal 🇵🇹',name:'Domicile 2025-26',type:'home',badge:'hot',cat:'Portugal',season:'25/26',price:24.99,img:IMG.jersey_red,img2:IMG.stadium},
+    {id:'bre-dom',club:'Brésil 🇧🇷',name:'Domicile 2025-26',type:'home',badge:'pop',cat:'Brésil',season:'25/26',price:24.99,img:IMG.jersey_yel,img2:IMG.fan2},
+  ];
+}
+
+let DB = loadDB();
+
+// ══ NAVIGATION ══
+function showView(id, sbItem) {
+  document.querySelectorAll('.view-tabs').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  if (sbItem) sbItem.classList.add('active');
+  else { document.querySelectorAll('.sb-item').forEach(b => { if (b.textContent.trim().toLowerCase().includes(id.substring(0,4))) b.classList.add('active'); }); }
+  const titles = {dashboard:'Vue d\'ensemble',products:'Produits',orders:'Commandes',database:'Base de données',export:'Export / Import',paypal:'Config PayPal',settings:'Paramètres'};
+  document.getElementById('topbarTitle').textContent = (titles[id]||id).toUpperCase();
+
+  if (id === 'database') refreshJsonEditor();
+  if (id === 'products') renderProdTable();
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'orders') renderOrders();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ══ DASHBOARD ══
+function renderDashboard() {
+  document.getElementById('ds-total').textContent = DB.length;
+  document.getElementById('productCountBadge').textContent = DB.length + ' produits';
+
+  // Orders stats
+  const orders = loadOrders();
+  const revenue = orders.reduce((s,o) => s + (o.total||0), 0);
+  const pending = orders.filter(o => o.status === 'paid' || o.status === 'processing').length;
+  if (document.getElementById('ds-orders')) document.getElementById('ds-orders').textContent = orders.length;
+  if (document.getElementById('ds-pending')) document.getElementById('ds-pending').textContent = pending;
+  if (document.getElementById('ds-revenue')) document.getElementById('ds-revenue').textContent = revenue.toFixed(2).replace('.',',') + ' €';
+
+  // checklist
+  if (document.getElementById('ck-products-icon')) document.getElementById('ck-products-icon').textContent = DB.length > 0 ? '✅' : '⏳';
+
+  // cat bars
+  const cats = {};
+  DB.forEach(p => cats[p.cat] = (cats[p.cat]||0)+1);
+  const max = Math.max(...Object.values(cats), 1);
+  if (document.getElementById('catBars')) document.getElementById('catBars').innerHTML = Object.entries(cats).map(([cat, n]) =>
+    `<div class="rev-bar-item">
+      <span class="rev-bar-label">${cat.replace(/[🇲🇦🇫🇷🇩🇿🇵🇹🇧🇷🏆]/g,'').trim()}</span>
+      <div class="rev-bar-bg"><div class="rev-bar-fill" style="width:${(n/max*100).toFixed(0)}%"></div></div>
+      <span class="rev-bar-val">${n}</span>
+    </div>`
+  ).join('');
+
+  // Update orders badge in sidebar
+  renderOrders();
+}
+
+// ══ PRODUCTS TABLE ══
+function renderProdTable() {
+  const q = (document.getElementById('prodSearch')?.value||'').toLowerCase();
+  const catF = document.getElementById('prodCatFilter')?.value||'';
+  const typeF = document.getElementById('prodTypeFilter')?.value||'';
+
+  // fill cat filter
+  const cats = [...new Set(DB.map(p=>p.cat))];
+  const catSel = document.getElementById('prodCatFilter');
+  if (catSel) {
+    const cur = catSel.value;
+    catSel.innerHTML = '<option value="">Tous les clubs</option>' + cats.map(c=>`<option value="${c}"${c===cur?'selected':''}>${c}</option>`).join('');
+  }
+
+  let prods = DB;
+  if (catF) prods = prods.filter(p=>p.cat===catF);
+  if (typeF) prods = prods.filter(p=>p.type===typeF);
+  if (q) prods = prods.filter(p=>(p.club+p.name).toLowerCase().includes(q));
+
+  document.getElementById('prodTableCount').textContent = `${prods.length} / ${DB.length} produits`;
+
+  const typeLabel = t => t==='home'?'Domicile':t==='away'?'Extérieur':'Édition spé.';
+  const typeClass = t => t==='home'?'type-home':t==='away'?'type-away':'type-special';
+  const badgeHtml = b => b==='hot'?'<span class="badge-pill badge-hot">HOT</span>':b==='new'?'<span class="badge-pill badge-new">NEW</span>':b==='pop'?'<span class="badge-pill badge-pop">POP</span>':'<span class="badge-none">—</span>';
+
+  document.getElementById('prodTableBody').innerHTML = prods.map(p=>`
+    <tr>
+      <td><img class="prod-thumb" src="${p.img}" onerror="this.src=''" alt="${p.club}"></td>
+      <td><div class="prod-club">${p.club}</div><div class="prod-name">${p.name}</div></td>
+      <td><span class="prod-type-pill ${typeClass(p.type)}">${typeLabel(p.type)}</span></td>
+      <td>${badgeHtml(p.badge)}</td>
+      <td style="font-family:var(--fm);font-size:9px;color:var(--text)">${p.season}</td>
+      <td><span class="prod-price">${(p.price||24.99).toFixed(2).replace('.',',')}€</span></td>
+      <td><div class="td-actions">
+        <button class="btn btn-outline btn-sm" onclick="editProduct('${p.id}')">✏️ Éditer</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div></td>
+    </tr>`
+  ).join('') || `<tr><td colspan="7" style="text-align:center;padding:32px;font-family:var(--fm);font-size:9px;color:var(--text)">Aucun produit trouvé</td></tr>`;
+}
+
+// ══ PRODUCT FORM ══
+let editingId = null;
+function openProductForm(id=null) {
+  editingId = id;
+  const p = id ? DB.find(x=>x.id===id) : null;
+  document.getElementById('formTitle').textContent = p ? 'ÉDITER PRODUIT' : 'NOUVEAU PRODUIT';
+  document.getElementById('fid').value = p?.id||'';
+  document.getElementById('fclub').value = p?.club||'';
+  document.getElementById('fcat').value = p?.cat||'';
+  document.getElementById('fname').value = p?.name||'';
+  document.getElementById('ftype').value = p?.type||'home';
+  document.getElementById('fbadge').value = p?.badge||'';
+  document.getElementById('fseason').value = p?.season||'25/26';
+  document.getElementById('fprice').value = p?.price||24.99;
+  document.getElementById('fimg').value = p?.img||'';
+  document.getElementById('fimg2').value = p?.img2||'';
+  document.getElementById('fid-display').value = p?.id||'';
+  const prev = document.getElementById('imgPreview');
+  if (p?.img) { prev.src = p.img; prev.style.display='block'; } else { prev.style.display='none'; }
+  document.getElementById('prodFormOverlay').classList.add('open');
+}
+
+function editProduct(id) { openProductForm(id); }
+
+function closeProductForm() { document.getElementById('prodFormOverlay').classList.remove('open'); }
+
+function previewImg() {
+  const url = document.getElementById('fimg').value.trim();
+  const prev = document.getElementById('imgPreview');
+  if (url) { prev.src=url; prev.style.display='block'; } else prev.style.display='none';
+}
+
+function saveProduct() {
+  const club = document.getElementById('fclub').value.trim();
+  const name = document.getElementById('fname').value.trim();
+  if (!club || !name) { showNotify('⚠️ Remplissez au moins le club et le nom'); return; }
+
+  const rawId = document.getElementById('fid-display').value.trim();
+  let id = rawId || (club.toLowerCase().replace(/[^a-z0-9]/g,'-') + '-' + Date.now());
+
+  const product = {
+    id, club,
+    name,
+    type: document.getElementById('ftype').value,
+    badge: document.getElementById('fbadge').value || null,
+    cat: document.getElementById('fcat').value.trim() || club,
+    season: document.getElementById('fseason').value.trim() || '25/26',
+    price: parseFloat(document.getElementById('fprice').value) || 24.99,
+    img: document.getElementById('fimg').value.trim(),
+    img2: document.getElementById('fimg2').value.trim(),
+  };
+
+  const existIdx = DB.findIndex(p => p.id === editingId);
+  if (existIdx >= 0) DB[existIdx] = product;
+  else DB.push(product);
+
+  saveDB(DB);
+  closeProductForm();
+  renderProdTable();
+  renderDashboard();
+  showNotify(`✅ "${product.club}" enregistré`);
+}
+
+function deleteProduct(id) {
+  const p = DB.find(x=>x.id===id);
+  if (!confirm(`Supprimer "${p?.club} — ${p?.name}" ?`)) return;
+  DB = DB.filter(x=>x.id!==id);
+  saveDB(DB);
+  renderProdTable();
+  renderDashboard();
+  showNotify('🗑 Produit supprimé');
+}
+
+// ══ JSON EDITOR ══
+function refreshJsonEditor() {
+  document.getElementById('jsonEditor').value = JSON.stringify(DB, null, 2);
+}
+
+function applyJsonEditor() {
+  try {
+    const parsed = JSON.parse(document.getElementById('jsonEditor').value);
+    if (!Array.isArray(parsed)) throw new Error('Doit être un tableau');
+    DB = parsed;
+    saveDB(DB);
+    renderDashboard();
+    showNotify('✅ Base de données mise à jour');
+  } catch(e) {
+    showNotify('❌ JSON invalide: ' + e.message);
+  }
+}
+
+// ══ EXPORT / IMPORT ══
+function exportDB() {
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kits-products-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showNotify('✅ Fichier téléchargé !');
+}
+
+function importDB(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!Array.isArray(parsed)) throw new Error('Format invalide');
+      DB = parsed;
+      saveDB(DB);
+      renderDashboard();
+      renderProdTable();
+      showNotify(`✅ ${DB.length} produits importés !`);
+    } catch(err) {
+      showNotify('❌ Fichier JSON invalide');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function generateCode() {
+  const code = `// ════ PRODUITS — Généré depuis le dashboard admin ════
+const PRODUCTS = ${JSON.stringify(DB, null, 2)};`;
+  document.getElementById('generatedCode').value = code;
+  showNotify('✅ Code généré !');
+}
+
+function copyCode() {
+  const ta = document.getElementById('generatedCode');
+  ta.select();
+  document.execCommand('copy');
+  showNotify('📋 Code copié dans le presse-papier !');
+}
+
+function resetDB() {
+  DB = getDefaultProducts();
+  saveDB(DB);
+  renderDashboard();
+  renderProdTable();
+  showNotify('✅ DB réinitialisée');
+}
+
+// ══ PAYPAL ══
+function savePaypalId() {
+  const id = document.getElementById('paypalClientId').value.trim();
+  if (!id) { showNotify('⚠️ Entrez votre Client ID'); return; }
+  const line = `<script src="https://www.paypal.com/sdk/js?client-id=${id}&currency=EUR&locale=fr_FR"><\/script>`;
+  document.getElementById('paypalCodeLine').value = line;
+  document.getElementById('paypalCodeResult').style.display = 'block';
+  showNotify('✅ Code généré ! Copiez-le dans kits-store.html');
+}
+
+// ══ SETTINGS ══
+function saveSettings() {
+  const settings = {
+    shopname: document.getElementById('set-shopname').value,
+    baseprice: document.getElementById('set-baseprice').value,
+    email: document.getElementById('set-email').value,
+    whatsapp: document.getElementById('set-whatsapp').value,
+    promo: document.getElementById('set-promo').value,
+    instagram: document.getElementById('set-instagram').value,
+  };
+  localStorage.setItem('kits_settings', JSON.stringify(settings));
+  showNotify('✅ Paramètres enregistrés');
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('kits_settings')||'{}');
+    if (s.shopname) document.getElementById('set-shopname').value = s.shopname;
+    if (s.baseprice) document.getElementById('set-baseprice').value = s.baseprice;
+    if (s.email) document.getElementById('set-email').value = s.email;
+    if (s.whatsapp) document.getElementById('set-whatsapp').value = s.whatsapp;
+    if (s.promo) document.getElementById('set-promo').value = s.promo;
+    if (s.instagram) document.getElementById('set-instagram').value = s.instagram;
+  } catch(e){}
+}
+
+// ══ NOTIFY ══
+let notifyTimer;
+function showNotify(msg) {
+  const el = document.getElementById('notify');
+  document.getElementById('notifyText').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ══ KEYBOARD ══
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeProductForm();
+    document.getElementById('sidebar').classList.remove('open');
+  }
+});
+
+document.getElementById('prodFormOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeProductForm();
+});
+
+// ══ ORDERS ══
+function loadOrders() {
+  try { return JSON.parse(localStorage.getItem('kits_orders') || '[]'); } catch(e) { return []; }
+}
+
+function saveOrders(orders) {
+  localStorage.setItem('kits_orders', JSON.stringify(orders));
+}
+
+function renderOrders() {
+  const orders = loadOrders();
+  const query = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  const statusF = document.getElementById('orderStatusFilter')?.value || 'all';
+
+  let filtered = orders;
+  if (statusF !== 'all') filtered = filtered.filter(o => o.status === statusF);
+  if (query) filtered = filtered.filter(o =>
+    o.id.toLowerCase().includes(query) ||
+    (o.customer?.name||'').toLowerCase().includes(query) ||
+    (o.customer?.email||'').toLowerCase().includes(query) ||
+    (o.customer?.city||'').toLowerCase().includes(query)
+  );
+
+  // Update badge
+  const pendingCount = orders.filter(o => o.status === 'paid' || o.status === 'processing').length;
+  const badge = document.getElementById('sb-orders-badge');
+  if (badge) { badge.textContent = pendingCount; badge.style.display = pendingCount > 0 ? 'inline' : 'none'; }
+
+  const wrap = document.getElementById('ordersTableWrap');
+  if (!wrap) return;
+
+  if (filtered.length === 0) {
+    wrap.innerHTML = `<div class="orders-empty">🛒 Aucune commande trouvée</div>`;
+    return;
+  }
+
+  const STATUS_LABELS = { paid:'✅ Payée', processing:'⚙️ En prép.', shipped:'🚚 Expédiée', delivered:'🏠 Livrée' };
+
+  wrap.innerHTML = `<table class="orders-table">
+    <thead><tr>
+      <th>N° Commande</th>
+      <th>Client</th>
+      <th>Articles</th>
+      <th>Total</th>
+      <th>Statut</th>
+      <th>Date</th>
+      <th></th>
+    </tr></thead>
+    <tbody>
+    ${filtered.map(o => {
+      const d = new Date(o.date);
+      const dateStr = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+      const timeStr = d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const itemsSummary = o.items.map(it => `${it.club} (${it.size})`).join(', ');
+      const statusCls = 'status-' + o.status;
+      const itemsHtml = o.items.map(it => {
+        let opts = [`Taille ${it.size}`];
+        if(it.patch) opts.push(`Patch: ${it.patch}`);
+        if(it.flockName) opts.push(`Flocage: ${it.flockName} ${it.flockNum||''}`);
+        if(it.flockBas) opts.push(`Bas: ${it.flockBas}`);
+        return `<div class="od-item"><div class="od-item-club">${it.club}</div>${it.name}<div class="od-item-opts">${opts.join(' · ')}</div></div>`;
+      }).join('');
+      return `
+        <tr onclick="toggleOrderDetail('${o.id}')" style="cursor:pointer">
+          <td><span class="order-id">${o.id}</span></td>
+          <td><div class="order-customer">${o.customer?.name||'—'}</div><div class="order-customer-email">${o.customer?.email||''}</div></td>
+          <td><div class="order-items-text">${itemsSummary}</div></td>
+          <td><span class="order-total">${o.total.toFixed(2).replace('.',',')} €</span></td>
+          <td><span class="status-badge ${statusCls}">${STATUS_LABELS[o.status]||o.status}</span></td>
+          <td style="font-family:var(--fm);font-size:8px;color:var(--text)">${dateStr}<br>${timeStr}</td>
+          <td onclick="event.stopPropagation()">
+            <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">🗑</button>
+          </td>
+        </tr>
+        <tr class="order-detail-row" id="detail-${o.id}">
+          <td colspan="7">
+            <div class="order-detail-content">
+              <div>
+                <div class="od-section-title">Articles commandés</div>
+                ${itemsHtml}
+              </div>
+              <div>
+                <div class="od-section-title">Infos client & livraison</div>
+                <div class="od-info-line"><span class="od-info-lbl">Nom</span>${o.customer?.name||'—'}</div>
+                <div class="od-info-line"><span class="od-info-lbl">Email</span>${o.customer?.email||'—'}</div>
+                <div class="od-info-line"><span class="od-info-lbl">Tél.</span>${o.customer?.phone||'—'}</div>
+                <div class="od-info-line"><span class="od-info-lbl">Adresse</span>${o.customer?.address||'—'}</div>
+                <div class="od-info-line"><span class="od-info-lbl">Ville</span>${o.customer?.postal||''} ${o.customer?.city||'—'}</div>
+                <div class="od-info-line"><span class="od-info-lbl">Pays</span>${o.customer?.country||'France'}</div>
+                ${o.customer?.phone ? `<div style="margin-top:8px"><a href="https://wa.me/${(o.customer.phone||'').replace(/\D/g,'')}" target="_blank" class="btn btn-outline btn-sm">💬 WhatsApp</a></div>` : ''}
+                <div style="margin-top:16px">
+                  <div class="od-section-title">Changer le statut</div>
+                  <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+                    <option value="paid" ${o.status==='paid'?'selected':''}>✅ Payée</option>
+                    <option value="processing" ${o.status==='processing'?'selected':''}>⚙️ En préparation</option>
+                    <option value="shipped" ${o.status==='shipped'?'selected':''}>🚚 Expédiée</option>
+                    <option value="delivered" ${o.status==='delivered'?'selected':''}>🏠 Livrée</option>
+                  </select>
+                </div>
+                <div style="margin-top:10px">
+                  <div class="od-section-title">N° suivi transporteur</div>
+                  <input type="text" class="tracking-num-input" id="tn-${o.id}" placeholder="Ex: 1Z999AA10123456784" value="${o.trackingNum||''}">
+                  <button class="btn btn-outline btn-sm" onclick="saveTrackingNum('${o.id}')">💾 Sauver</button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function toggleOrderDetail(id) {
+  const row = document.getElementById('detail-' + id);
+  if (!row) return;
+  row.classList.toggle('open');
+}
+
+function updateOrderStatus(id, status) {
+  const orders = loadOrders();
+  const idx = orders.findIndex(o => o.id === id);
+  if (idx < 0) return;
+  orders[idx].status = status;
+  saveOrders(orders);
+  renderOrders();
+  renderDashboard();
+  showNotify(`✅ Statut mis à jour : ${status}`);
+}
+
+function saveTrackingNum(id) {
+  const val = document.getElementById('tn-' + id)?.value.trim();
+  const orders = loadOrders();
+  const idx = orders.findIndex(o => o.id === id);
+  if (idx < 0) return;
+  orders[idx].trackingNum = val;
+  if (val) orders[idx].status = 'shipped';
+  saveOrders(orders);
+  renderOrders();
+  showNotify('✅ N° de suivi sauvegardé' + (val ? ' — Statut → Expédiée' : ''));
+}
+
+function deleteOrder(id) {
+  if (!confirm('Supprimer cette commande ?')) return;
+  const orders = loadOrders().filter(o => o.id !== id);
+  saveOrders(orders);
+  renderOrders();
+  renderDashboard();
+  showNotify('🗑 Commande supprimée');
+}
+
+// ══ INIT
+loadSettings();
+renderDashboard();
+renderOrders();
+</script>
+</body>
+</html>
