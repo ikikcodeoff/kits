@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<!-- ⚠️ PAIEMENT : Remplace "sb" par ton vrai client-id PayPal pour recevoir l'argent -->
-<!-- Va sur developer.paypal.com → My Apps → Create App → copie le Client ID LIVE -->
 <script src="https://www.paypal.com/sdk/js?client-id=AY9J3meWNGQm8VI7jJjzcfJREUXP1gycoz_XgADS54lm--SJXdJllQTTgwrQgRbc4myC90-AdC_VVtza&currency=EUR&locale=fr_FR"></script>
 <style>
 :root{
@@ -807,7 +805,6 @@ const PATCHES = [
   {id:'mls',    name:'MLS'},
   {id:'none',   name:'Sans patch'},
 ];
-
 // ════ PRODUITS — Généré depuis le dashboard admin ════
 const PRODUCTS = [
   {
@@ -3115,7 +3112,6 @@ const PRODUCTS = [
     "img2": ""
   }
 ];
-
 // ════ CHARGEMENT DYNAMIQUE depuis localStorage (synchro avec le dashboard) ════
 function loadProductsFromStorage() {
   try {
